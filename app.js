@@ -3,6 +3,7 @@ const $ = (id) => document.getElementById(id);
 const icons = { discord: "◖◗", github: "⌘", instagram: "◎", website: "↗", twitter: "𝕏", youtube: "▷", email: "@" };
 document.documentElement.style.setProperty("--accent", config.accent);
 document.documentElement.style.setProperty("--accent-2", config.accentSecondary);
+document.documentElement.style.setProperty("--desktop-card-width", `${config.desktopCardWidth || 720}px`);
 document.title = `${config.displayName} · bio`;
 document.querySelector('meta[name="description"]').content = config.bio;
 document.querySelector('meta[property="og:title"]').content = `${config.displayName} · bio`;

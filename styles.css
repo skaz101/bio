@@ -67,19 +67,19 @@ footer { justify-content:space-between; margin-top:18px; padding-top:15px; borde
 .toast { position:fixed; z-index:60; left:50%; bottom:24px; padding:10px 14px; color:#eee; background:#18181d; border:1px solid #ffffff18; border-radius:10px; font:11px DM Mono,monospace; opacity:0; transform:translate(-50%,10px); pointer-events:none; transition:.25s; }.toast.show { opacity:1; transform:translate(-50%,0); }
 .effects-off #particles,.effects-off .grain { display:none; }.effects-off .profile-card { transition:none; }
 @media (min-width:760px) {
-  .profile-card { width:min(600px,calc(100vw - 64px)); padding:30px; border-radius:34px; }
-  .card-glow { width:330px; height:330px; }
-  .topbar { margin-bottom:28px; }
-  .status { gap:10px; font-size:13px; }.status i { width:9px; height:9px; }
-  .actions { gap:9px; }.icon-button { width:42px; height:42px; border-radius:12px; font-size:17px; }
-  .identity { gap:21px; }.avatar { width:104px; height:104px; border-radius:27px; }.presence { width:22px; height:22px; }
-  h1 { font-size:40px; }.verified { width:22px; height:22px; font-size:13px; }.handle { font-size:15px; }
-  .bio { margin-top:25px; font-size:17px; line-height:1.65; }.type-line { height:27px; font-size:14px; }
-  .badges { gap:9px; margin:17px 0 23px; }.badge { padding:8px 11px; font-size:12px; }
-  .activity { gap:14px; margin-bottom:15px; padding:14px; border-radius:16px; }.activity-art { width:48px; height:48px; }.activity-copy small,.activity-live { font-size:10px; }.activity-copy strong { font-size:14px; }.activity-copy span { font-size:11px; }
-  .links { gap:11px; }.link { gap:14px; padding:15px; border-radius:16px; }.link-icon { width:32px; font-size:19px; }.link-copy strong { font-size:15px; }.link-copy small { font-size:12px; }
-  .player { gap:14px; margin-top:19px; padding:14px; border-radius:17px; }.play-button { width:44px; height:44px; border-radius:12px; font-size:14px; }.track-info strong { font-size:14px; }.track-info span,.time { font-size:11px; }.progress { height:4px; margin-top:9px; }.volume-button { font-size:16px; }
-  footer { margin-top:22px; padding-top:18px; font-size:11px; }.hint { margin-top:19px; font-size:11px; }
+  .profile-card { width:min(var(--desktop-card-width,720px),calc(100vw - 64px)); padding:36px; border-radius:38px; }
+  .card-glow { width:390px; height:390px; }
+  .topbar { margin-bottom:32px; }
+  .status { gap:11px; font-size:15px; }.status i { width:10px; height:10px; }
+  .actions { gap:10px; }.icon-button { width:48px; height:48px; border-radius:14px; font-size:20px; }
+  .identity { gap:25px; }.avatar { width:122px; height:122px; border-radius:31px; }.presence { width:25px; height:25px; }
+  h1 { font-size:48px; }.verified { width:25px; height:25px; font-size:15px; }.handle { font-size:18px; }
+  .bio { margin-top:29px; font-size:20px; line-height:1.6; }.type-line { height:31px; font-size:17px; }
+  .badges { gap:10px; margin:19px 0 26px; }.badge { padding:9px 13px; font-size:14px; }
+  .activity { gap:16px; margin-bottom:17px; padding:16px; border-radius:18px; }.activity-art { width:56px; height:56px; }.activity-copy small,.activity-live { font-size:11px; }.activity-copy strong { font-size:16px; }.activity-copy span { font-size:13px; }
+  .links { gap:13px; }.link { gap:16px; padding:18px; border-radius:18px; }.link-icon { width:36px; font-size:22px; }.link-copy strong { font-size:17px; }.link-copy small { font-size:14px; }
+  .player { gap:16px; margin-top:22px; padding:16px; border-radius:19px; }.play-button { width:50px; height:50px; border-radius:14px; font-size:16px; }.track-info strong { font-size:16px; }.track-info span,.time { font-size:13px; }.progress { height:5px; margin-top:10px; }.volume-button { font-size:19px; }
+  footer { margin-top:25px; padding-top:20px; font-size:13px; }.hint { margin-top:21px; font-size:12px; }
 }
 @media (max-width:520px) { .page { place-content:start center; padding-top:max(18px,env(safe-area-inset-top)); }.profile-card { padding:17px; border-radius:23px; }.links { grid-template-columns:1fr; }.avatar { width:72px; height:72px; border-radius:19px; }.hint { display:none; } }
 @media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important; animation-duration:.01ms!important; animation-iteration-count:1!important; transition-duration:.01ms!important; } }

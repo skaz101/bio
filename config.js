@@ -20,10 +20,11 @@ window.BIO_CONFIG = {
   avatar: "assets/avatar.svg",
   accent: "#8b5cf6",
   accentSecondary: "#22d3ee",
+  desktopCardWidth: 720,
   backgroundVideo: {
     enabled: true,
     src: "assets/background.mp4",
-    poster: "",
+    poster: "assets/background-poster.webp",
     opacity: 0.62,
     playbackRate: 1
   },
