@@ -23,8 +23,8 @@ window.BIO_CONFIG = {
   desktopCardWidth: 720,
   backgroundVideo: {
     enabled: true,
-    src: "assets/background.mp4",
-    poster: "assets/background-poster.webp",
+    src: "assets/background.mp4?v=20260619-2",
+    poster: "assets/background-poster.webp?v=20260619-2",
     opacity: 0.62,
     playbackRate: 1
   },
@@ -39,7 +39,7 @@ window.BIO_CONFIG = {
   ],
   audio: {
     enabled: true,
-    src: "assets/audio.mp3",
+    src: "assets/audio.mp3?v=20260619-2",
     title: "Poa Alpina",
     artist: "Biosphere",
     volume: 0.5,
