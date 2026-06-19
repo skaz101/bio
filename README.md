@@ -1,13 +1,13 @@
 # bio
 
-## Cloudflare view counter
+## Cloudflare Worker deployment
 
-The `/api/views` Pages Function records one view per IP/device combination every 24 hours. It stores a SHA-256 visitor hash, not the raw IP address.
+The site deploys as a Cloudflare Worker with static assets. Use these Git build settings:
 
-In the Cloudflare dashboard:
+- Build command: leave blank
+- Deploy command: `npx wrangler deploy`
+- Root directory: `/`
 
-1. Open **Storage & Databases > KV** and create a namespace named `bio-views`.
-2. Open this Pages project, then **Settings > Bindings > Add > KV namespace**.
-3. Set the variable name to `VIEWS` and select `bio-views`.
-4. Optional: add an encrypted environment variable named `VIEW_SALT` with a long random value.
-5. Redeploy the latest Pages deployment so the binding becomes active.
+The `VIEWS` KV binding in `wrangler.jsonc` is created automatically during deployment. The `/api/views` endpoint records one view per IP/device combination every 24 hours and stores a SHA-256 visitor hash rather than the raw IP address.
+
+Optionally add an encrypted runtime variable named `VIEW_SALT` under **Settings > Variables and Secrets** for stronger visitor hashing.

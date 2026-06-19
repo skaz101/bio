@@ -1,2 +1,4 @@
 bio-site-pages.zip
 assets/background-original.mp4
+node_modules/
+.wrangler/
