@@ -1,6 +1,7 @@
 const config = window.BIO_CONFIG;
 const $ = (id) => document.getElementById(id);
-const icons = { discord: "◖◗", github: "⌘", instagram: "◎", website: "↗", twitter: "𝕏", youtube: "▷", email: "@" };
+const discordIcon = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.2 5.5c3.2-1.3 6.4-1.3 9.6 0 2.1 3.1 3 6.3 2.6 9.5-1.4 1.7-2.8 2.5-4.2 3l-1-1.4c.9-.3 1.7-.7 2.4-1.2-3.1 1.4-6.1 1.4-9.2 0 .7.5 1.5.9 2.4 1.2l-1 1.4c-1.4-.5-2.8-1.3-4.2-3-.4-3.2.5-6.4 2.6-9.5Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="9.3" cy="11.7" r="1.2"/><circle cx="14.7" cy="11.7" r="1.2"/></svg>`;
+const icons = { discord: discordIcon, github: "⌘", instagram: "◎", website: "↗", twitter: "𝕏", youtube: "▷", email: "@" };
 document.documentElement.style.setProperty("--accent", config.accent);
 document.documentElement.style.setProperty("--accent-2", config.accentSecondary);
 document.documentElement.style.setProperty("--desktop-card-width", `${config.desktopCardWidth || 720}px`);
@@ -14,6 +15,7 @@ $("handle").textContent = config.handle;
 $("statusText").textContent = config.status;
 $("bio").textContent = config.bio;
 $("avatar").src = config.avatar;
+$("entryAvatar").src = config.avatar;
 $("entryText").textContent = config.entryText;
 $("footerText").textContent = config.footerText;
 $("badges").innerHTML = config.badges.map((b) => `<span class="badge" title="${b.label}"><span>${b.icon}</span>${b.label}</span>`).join("");
@@ -72,7 +74,11 @@ async function loadDiscord() {
     const data = payload.data, user = data.discord_user;
     if (live.useDisplayName) $("displayName").textContent = user.global_name || user.display_name || user.username;
     if (live.useUsername) $("handle").textContent = `@${user.username}`;
-    if (live.useAvatar) $("avatar").src = discordAvatar(user);
+    if (live.useAvatar) {
+      const avatarUrl = discordAvatar(user);
+      $("avatar").src = avatarUrl;
+      $("entryAvatar").src = avatarUrl;
+    }
     if (live.useStatus) {
       $("statusText").textContent = data.discord_status;
       const color = statusColors[data.discord_status] || statusColors.offline;
@@ -87,15 +93,22 @@ if (config.discordLive?.refreshSeconds) setInterval(loadDiscord, Math.max(15, co
 function toast(message) { const el=$("toast"); el.textContent=message; el.classList.add("show"); clearTimeout(toast.timer); toast.timer=setTimeout(()=>el.classList.remove("show"),1800); }
 $("enterButton").addEventListener("click", async () => {
   $("entry").classList.add("hidden"); $("page").classList.add("visible"); $("page").setAttribute("aria-hidden","false");
-  if (videoConfig?.enabled) { try { await backgroundVideo.play(); } catch {} }
-  if (config.audio.enabled && config.audio.autoplayAfterEntry) { try { await audio.play(); } catch {} }
+  const playback = [];
+  if (videoConfig?.enabled) playback.push(backgroundVideo.play());
+  if (config.audio.enabled && config.audio.autoplayAfterEntry) playback.push(audio.play());
+  const results = await Promise.allSettled(playback);
+  if (results.some((result) => result.status === "rejected") && audio.error) toast("Audio file could not be loaded");
 });
 $("copyHandle").addEventListener("click", async () => { await navigator.clipboard.writeText($("handle").textContent.replace(/^@/,"")); toast("Discord username copied"); });
 $("shareButton").addEventListener("click", async () => { if (navigator.share) await navigator.share({title:document.title,url:location.href}); else { await navigator.clipboard.writeText(location.href); toast("Profile link copied"); } });
 $("effectsButton").addEventListener("click", () => { document.body.classList.toggle("effects-off"); toast(document.body.classList.contains("effects-off")?"Effects off":"Effects on"); });
-$("playButton").addEventListener("click", () => audio.paused ? audio.play() : audio.pause());
+$("playButton").addEventListener("click", async () => {
+  if (!audio.paused) { audio.pause(); return; }
+  try { await audio.play(); } catch { toast("Add assets/audio.mp3 to enable music"); }
+});
 $("volumeButton").addEventListener("click", () => { audio.muted=!audio.muted; $("volumeButton").textContent=audio.muted?"×":"♪"; });
 audio.addEventListener("play",()=>$("playButton").textContent="Ⅱ"); audio.addEventListener("pause",()=>$("playButton").textContent="▶");
+audio.addEventListener("error",()=>{ $("playButton").textContent="!"; $("playButton").setAttribute("aria-label","Audio unavailable"); });
 audio.addEventListener("timeupdate",()=>{ const p=audio.duration?audio.currentTime/audio.duration*100:0; $("progressFill").style.width=`${p}%`; $("trackTime").textContent=`${Math.floor(audio.currentTime/60)}:${String(Math.floor(audio.currentTime%60)).padStart(2,"0")}`; });
 $("progress").addEventListener("click",(e)=>{ if(audio.duration) audio.currentTime=(e.offsetX/e.currentTarget.clientWidth)*audio.duration; });
 

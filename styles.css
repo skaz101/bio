@@ -12,7 +12,8 @@ button,a { font:inherit; -webkit-tap-highlight-color:transparent; }
 .entry { position:fixed; inset:0; z-index:50; display:grid; place-items:center; background:#07070a; transition:opacity .7s ease,visibility .7s; }
 .entry.hidden { opacity:0; visibility:hidden; }
 .entry-button { border:0; color:#fff; background:transparent; cursor:pointer; display:grid; gap:14px; justify-items:center; text-transform:lowercase; letter-spacing:.18em; font:500 12px DM Mono,monospace; }
-.entry-icon { display:grid; place-items:center; width:60px; height:60px; border:1px solid #ffffff24; border-radius:50%; font-size:22px; box-shadow:0 0 50px color-mix(in srgb,var(--accent) 35%,transparent); animation:pulse 2s ease-in-out infinite; }
+.entry-icon { display:grid; place-items:center; width:94px; height:94px; padding:4px; overflow:hidden; border:1px solid #ffffff24; border-radius:50%; background:#101016; box-shadow:0 0 50px color-mix(in srgb,var(--accent) 35%,transparent); animation:pulse 2s ease-in-out infinite; }
+.entry-icon img { width:100%; height:100%; border-radius:50%; object-fit:cover; }
 @keyframes pulse { 50% { transform:scale(1.08); border-color:var(--accent); } }
 .page { position:relative; z-index:2; min-height:100svh; padding:max(28px,env(safe-area-inset-top)) 18px max(24px,env(safe-area-inset-bottom)); display:grid; place-content:center; justify-items:center; opacity:0; transform:translateY(10px); transition:.7s ease .15s; perspective:1200px; }
 .page.visible { opacity:1; transform:none; }
@@ -54,7 +55,8 @@ h1 { margin:0; font-size:clamp(25px,7vw,32px); letter-spacing:-.04em; line-heigh
 .links { display:grid; grid-template-columns:1fr 1fr; gap:9px; }
 .link { min-width:0; display:flex; align-items:center; gap:11px; padding:12px; color:#f4f4f5; text-decoration:none; border:1px solid #ffffff12; border-radius:13px; background:#ffffff07; transition:.2s ease; }
 .link:hover { border-color:color-mix(in srgb,var(--accent) 50%,transparent); background:#ffffff0c; transform:translateY(-2px); }
-.link-icon { width:27px; color:var(--accent-2); font:500 15px DM Mono,monospace; text-align:center; }
+.link-icon { width:27px; color:var(--accent-2); font:500 15px DM Mono,monospace; text-align:center; display:grid; place-items:center; }
+.link-icon svg { width:21px; height:21px; fill:currentColor; }
 .link-copy { min-width:0; display:grid; }.link-copy strong { font-size:12px; }.link-copy small { overflow:hidden; color:#85858f; font:10px DM Mono,monospace; text-overflow:ellipsis; white-space:nowrap; margin-top:2px; }
 .player { gap:11px; margin-top:16px; padding:11px; border:1px solid #ffffff12; border-radius:14px; background:#09090d88; }
 .play-button,.volume-button { border:0; color:#fff; background:none; cursor:pointer; }.play-button { width:35px; height:35px; flex:none; border-radius:10px; background:linear-gradient(135deg,var(--accent),var(--accent-2)); color:#08080a; font-size:12px; }.volume-button { color:#aaaab3; padding:7px; }
@@ -77,7 +79,7 @@ footer { justify-content:space-between; margin-top:18px; padding-top:15px; borde
   .bio { margin-top:29px; font-size:20px; line-height:1.6; }.type-line { height:31px; font-size:17px; }
   .badges { gap:10px; margin:19px 0 26px; }.badge { padding:9px 13px; font-size:14px; }
   .activity { gap:16px; margin-bottom:17px; padding:16px; border-radius:18px; }.activity-art { width:56px; height:56px; }.activity-copy small,.activity-live { font-size:11px; }.activity-copy strong { font-size:16px; }.activity-copy span { font-size:13px; }
-  .links { gap:13px; }.link { gap:16px; padding:18px; border-radius:18px; }.link-icon { width:36px; font-size:22px; }.link-copy strong { font-size:17px; }.link-copy small { font-size:14px; }
+  .links { gap:13px; }.link { gap:16px; padding:18px; border-radius:18px; }.link-icon { width:36px; font-size:22px; }.link-icon svg { width:27px; height:27px; }.link-copy strong { font-size:17px; }.link-copy small { font-size:14px; }
   .player { gap:16px; margin-top:22px; padding:16px; border-radius:19px; }.play-button { width:50px; height:50px; border-radius:14px; font-size:16px; }.track-info strong { font-size:16px; }.track-info span,.time { font-size:13px; }.progress { height:5px; margin-top:10px; }.volume-button { font-size:19px; }
   footer { margin-top:25px; padding-top:20px; font-size:13px; }.hint { margin-top:21px; font-size:12px; }
 }
