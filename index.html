@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#09090b" />
+    <meta name="description" content="Personal links and profile." />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="My bio" />
+    <meta property="og:description" content="Find me everywhere." />
+    <title>My bio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="video-background" id="videoBackground" hidden aria-hidden="true">
+      <video id="backgroundVideo" muted loop playsinline preload="metadata"></video>
+      <div class="video-overlay"></div>
+    </div>
+    <canvas id="particles" aria-hidden="true"></canvas>
+    <div class="grain" aria-hidden="true"></div>
+
+    <div class="entry" id="entry">
+      <button class="entry-button" id="enterButton" type="button">
+        <span class="entry-icon">✦</span>
+        <span id="entryText">click to enter</span>
+      </button>
+    </div>
+
+    <main class="page" id="page" aria-hidden="true">
+      <section class="profile-card" id="profileCard">
+        <div class="card-glow" aria-hidden="true"></div>
+        <div class="topbar">
+          <span class="status"><i></i><span id="statusText">online</span></span>
+          <div class="actions">
+            <button class="icon-button" id="effectsButton" type="button" aria-label="Toggle effects" title="Toggle effects">✦</button>
+            <button class="icon-button" id="shareButton" type="button" aria-label="Share profile" title="Share profile">↗</button>
+          </div>
+        </div>
+
+        <div class="identity">
+          <div class="avatar-wrap">
+            <img id="avatar" class="avatar" alt="Profile avatar" />
+            <span class="presence" title="Online"></span>
+          </div>
+          <div>
+            <div class="name-row">
+              <h1 id="displayName">your name</h1>
+              <span class="verified" title="Verified" aria-label="Verified">✓</span>
+            </div>
+            <button class="handle" id="copyHandle" type="button" title="Copy Discord username">
+              <span id="handle">@username</span><span class="copy-icon">⧉</span>
+            </button>
+          </div>
+        </div>
+
+        <p class="bio" id="bio"></p>
+        <div class="type-line"><span id="typedText"></span><i></i></div>
+        <div class="badges" id="badges" aria-label="Profile badges"></div>
+        <div class="activity" id="activity" hidden>
+          <div class="activity-art" id="activityArt">◈</div>
+          <div class="activity-copy">
+            <small id="activityType">PLAYING</small>
+            <strong id="activityName"></strong>
+            <span id="activityDetails"></span>
+          </div>
+          <span class="activity-live">LIVE</span>
+        </div>
+        <nav class="links" id="links" aria-label="Social links"></nav>
+
+        <div class="player" id="player">
+          <button class="play-button" id="playButton" type="button" aria-label="Play audio">▶</button>
+          <div class="track-info">
+            <strong id="trackTitle">Track title</strong>
+            <span id="trackArtist">Artist</span>
+            <div class="progress" id="progress"><i id="progressFill"></i></div>
+          </div>
+          <span class="time" id="trackTime">0:00</span>
+          <button class="volume-button" id="volumeButton" type="button" aria-label="Mute audio">♪</button>
+        </div>
+
+        <footer>
+          <span><i class="eye"></i><span id="viewCount">1</span> views</span>
+          <span id="footerText">bio.dahome.site</span>
+        </footer>
+      </section>
+      <p class="hint">move your cursor · tap the links</p>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <audio id="audio" preload="metadata" loop></audio>
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
