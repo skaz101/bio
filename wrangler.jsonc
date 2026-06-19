@@ -10,7 +10,8 @@
   },
   "kv_namespaces": [
     {
-      "binding": "VIEWS"
+      "binding": "VIEWS",
+      "id": "f03e4d8dabb445e0a06f3cbf5e443dd8"
     }
   ]
 }
