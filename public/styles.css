@@ -69,19 +69,20 @@ footer { justify-content:space-between; margin-top:18px; padding-top:15px; borde
 .toast { position:fixed; z-index:60; left:50%; bottom:24px; padding:10px 14px; color:#eee; background:#18181d; border:1px solid #ffffff18; border-radius:10px; font:11px DM Mono,monospace; opacity:0; transform:translate(-50%,10px); pointer-events:none; transition:.25s; }.toast.show { opacity:1; transform:translate(-50%,0); }
 .effects-off #particles,.effects-off .grain { display:none; }.effects-off .profile-card { transition:none; }
 @media (min-width:760px) {
-  .profile-card { width:min(var(--desktop-card-width,720px),calc(100vw - 64px)); padding:36px; border-radius:38px; }
-  .card-glow { width:390px; height:390px; }
-  .topbar { margin-bottom:32px; }
-  .status { gap:11px; font-size:15px; }.status i { width:10px; height:10px; }
-  .actions { gap:10px; }.icon-button { width:48px; height:48px; border-radius:14px; font-size:20px; }
-  .identity { gap:25px; }.avatar { width:122px; height:122px; border-radius:31px; }.presence { width:25px; height:25px; }
-  h1 { font-size:48px; }.verified { width:25px; height:25px; font-size:15px; }.handle { font-size:18px; }
-  .bio { margin-top:29px; font-size:20px; line-height:1.6; }.type-line { height:31px; font-size:17px; }
-  .badges { gap:10px; margin:19px 0 26px; }.badge { padding:9px 13px; font-size:14px; }
-  .activity { gap:16px; margin-bottom:17px; padding:16px; border-radius:18px; }.activity-art { width:56px; height:56px; }.activity-copy small,.activity-live { font-size:11px; }.activity-copy strong { font-size:16px; }.activity-copy span { font-size:13px; }
-  .links { gap:13px; }.link { gap:16px; padding:18px; border-radius:18px; }.link-icon { width:36px; font-size:22px; }.link-icon svg { width:27px; height:27px; }.link-copy strong { font-size:17px; }.link-copy small { font-size:14px; }
-  .player { gap:16px; margin-top:22px; padding:16px; border-radius:19px; }.play-button { width:50px; height:50px; border-radius:14px; font-size:16px; }.track-info strong { font-size:16px; }.track-info span,.time { font-size:13px; }.progress { height:5px; margin-top:10px; }.volume-button { font-size:19px; }
-  footer { margin-top:25px; padding-top:20px; font-size:13px; }.hint { margin-top:21px; font-size:12px; }
+  .page { padding-block:clamp(18px,2.7vh,28px); }
+  .profile-card { width:min(var(--desktop-card-width,720px),calc(100vw - 64px),78vh); min-width:min(540px,calc(100vw - 64px)); padding:clamp(27px,3.4vh,36px); border-radius:clamp(30px,3.6vh,38px); }
+  .card-glow { width:clamp(310px,37vh,390px); height:clamp(310px,37vh,390px); }
+  .topbar { margin-bottom:clamp(24px,3vh,32px); }
+  .status { gap:clamp(9px,1vh,11px); font-size:clamp(13px,1.45vh,15px); }.status i { width:clamp(8px,1vh,10px); height:clamp(8px,1vh,10px); }
+  .actions { gap:clamp(8px,1vh,10px); }.icon-button { width:clamp(40px,4.6vh,48px); height:clamp(40px,4.6vh,48px); border-radius:clamp(11px,1.35vh,14px); font-size:clamp(17px,1.9vh,20px); }
+  .identity { gap:clamp(19px,2.4vh,25px); }.avatar { width:clamp(96px,11.5vh,122px); height:clamp(96px,11.5vh,122px); border-radius:clamp(25px,3vh,31px); }.presence { width:clamp(21px,2.4vh,25px); height:clamp(21px,2.4vh,25px); }
+  h1 { font-size:clamp(39px,4.6vh,48px); }.verified { width:clamp(21px,2.4vh,25px); height:clamp(21px,2.4vh,25px); font-size:clamp(13px,1.45vh,15px); }.handle { font-size:clamp(15px,1.7vh,18px); }
+  .bio { margin-top:clamp(22px,2.7vh,29px); font-size:clamp(16px,1.9vh,20px); line-height:1.6; }.type-line { height:clamp(25px,2.9vh,31px); font-size:clamp(14px,1.6vh,17px); }
+  .badges { gap:clamp(8px,1vh,10px); margin:clamp(15px,1.8vh,19px) 0 clamp(20px,2.5vh,26px); }.badge { padding:clamp(7px,.85vh,9px) clamp(10px,1.2vh,13px); font-size:clamp(11px,1.3vh,14px); }
+  .activity { gap:clamp(13px,1.5vh,16px); margin-bottom:clamp(13px,1.6vh,17px); padding:clamp(13px,1.5vh,16px); border-radius:clamp(15px,1.7vh,18px); }.activity-art { width:clamp(46px,5.3vh,56px); height:clamp(46px,5.3vh,56px); }.activity-copy small,.activity-live { font-size:clamp(9px,1.05vh,11px); }.activity-copy strong { font-size:clamp(13px,1.5vh,16px); }.activity-copy span { font-size:clamp(11px,1.2vh,13px); }
+  .links { gap:clamp(10px,1.2vh,13px); }.link { gap:clamp(13px,1.5vh,16px); padding:clamp(14px,1.7vh,18px); border-radius:clamp(15px,1.7vh,18px); }.link-icon { width:clamp(30px,3.4vh,36px); font-size:clamp(18px,2.1vh,22px); }.link-icon svg { width:clamp(22px,2.5vh,27px); height:clamp(22px,2.5vh,27px); }.link-copy strong { font-size:clamp(14px,1.6vh,17px); }.link-copy small { font-size:clamp(11px,1.3vh,14px); }
+  .player { gap:clamp(13px,1.5vh,16px); margin-top:clamp(17px,2.1vh,22px); padding:clamp(13px,1.5vh,16px); border-radius:clamp(16px,1.8vh,19px); }.play-button { width:clamp(42px,4.8vh,50px); height:clamp(42px,4.8vh,50px); border-radius:clamp(12px,1.35vh,14px); font-size:clamp(13px,1.5vh,16px); }.track-info strong { font-size:clamp(13px,1.5vh,16px); }.track-info span,.time { font-size:clamp(10px,1.2vh,13px); }.progress { height:clamp(4px,.48vh,5px); margin-top:clamp(8px,.95vh,10px); }.volume-button { font-size:clamp(16px,1.8vh,19px); }
+  footer { margin-top:clamp(19px,2.3vh,25px); padding-top:clamp(16px,1.9vh,20px); font-size:clamp(10px,1.2vh,13px); }.hint { margin-top:clamp(16px,2vh,21px); font-size:clamp(10px,1.1vh,12px); }
 }
 @media (max-width:520px) { .page { place-content:start center; padding-top:max(18px,env(safe-area-inset-top)); }.profile-card { padding:17px; border-radius:23px; }.links { grid-template-columns:1fr; }.avatar { width:72px; height:72px; border-radius:19px; }.hint { display:none; } }
 @media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important; animation-duration:.01ms!important; animation-iteration-count:1!important; transition-duration:.01ms!important; } }
