@@ -116,7 +116,18 @@ let word=0,letter=0,deleting=false;
 function type() { const text=config.typing[word]||""; $("typedText").textContent=text.slice(0,letter); if(!deleting&&letter<text.length) letter++; else if(!deleting){deleting=true;return setTimeout(type,1300)} else if(letter>0) letter--; else {deleting=false;word=(word+1)%config.typing.length} setTimeout(type,deleting?45:85); }
 type();
 
-const count=Number(localStorage.getItem("bio_views")||0)+1; localStorage.setItem("bio_views",count); $("viewCount").textContent=count.toLocaleString();
+async function loadViews() {
+  try {
+    const response = await fetch("/api/views", { method: "POST", cache: "no-store" });
+    if (!response.ok) throw new Error("View counter is unavailable");
+    const data = await response.json();
+    $("viewCount").textContent = Number(data.count).toLocaleString();
+  } catch (error) {
+    $("viewCount").textContent = "—";
+    console.warn(error.message);
+  }
+}
+loadViews();
 const card=$("profileCard");
 if(config.effects.tilt && matchMedia("(pointer:fine)").matches){ card.addEventListener("pointermove",e=>{const r=card.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;card.style.setProperty("--x",`${x*100}%`);card.style.setProperty("--y",`${y*100}%`);card.style.transform=`rotateX(${(0.5-y)*5}deg) rotateY(${(x-0.5)*5}deg)`}); card.addEventListener("pointerleave",()=>card.style.transform=""); }
 
