@@ -51,15 +51,12 @@ function activityImage(activity) {
   return activity.application_id ? `https://cdn.discordapp.com/app-assets/${activity.application_id}/${image}.webp` : "";
 }
 function renderActivity(data) {
-  const custom = data.activities.find((item) => item.type === 4);
-  const active = data.spotify || data.activities.find((item) => item.type !== 4);
-  if (!active && !custom) { $("activity").hidden = true; return; }
-  const item = active || custom;
-  const types = ["PLAYING", "STREAMING", "LISTENING TO", "WATCHING", "CUSTOM STATUS", "COMPETING IN"];
-  $("activityType").textContent = data.spotify ? "LISTENING TO SPOTIFY" : (types[item.type] || "ACTIVE");
-  $("activityName").textContent = data.spotify?.song || item.name || "Discord";
-  $("activityDetails").textContent = data.spotify?.artist || item.details || item.state || "";
-  const image = data.spotify?.album_art_url || activityImage(item);
+  const item = data.activities.find((activity) => activity.type === 0);
+  if (!item) { $("activity").hidden = true; return; }
+  $("activityType").textContent = "PLAYING";
+  $("activityName").textContent = item.name || "Game";
+  $("activityDetails").textContent = item.details || item.state || "";
+  const image = activityImage(item);
   $("activityArt").innerHTML = image ? `<img src="${image}" alt="">` : "◈";
   $("activity").hidden = false;
 }

@@ -1,3 +1,5 @@
+import { enrichIpMetadata } from "../lib/ip-metadata.js";
+
 const JSON_HEADERS = {
   "content-type": "application/json; charset=utf-8",
   "cache-control": "no-store",
@@ -31,7 +33,7 @@ async function encryptIp(ip, secret) {
   return btoa(String.fromCharCode(...packed));
 }
 
-async function describeVisitor(request, visitor, encryptionKey) {
+async function describeVisitor(request, visitor, encryptionKey, kv, previous) {
   const cf = request.cf || {};
   const ip = request.headers.get("CF-Connecting-IP") || "unknown";
   const agent = request.headers.get("User-Agent") || "";
@@ -43,18 +45,22 @@ async function describeVisitor(request, visitor, encryptionKey) {
   const browser = /edg\//i.test(agent) ? "Edge" : /firefox\//i.test(agent) ? "Firefox" : /chrome\//i.test(agent) ? "Chrome" : /safari\//i.test(agent) ? "Safari" : "Other";
   const os = /windows/i.test(agent) ? "Windows" : /android/i.test(agent) ? "Android" : /iphone|ipad/i.test(agent) ? "iOS" : /mac os/i.test(agent) ? "macOS" : /linux/i.test(agent) ? "Linux" : "Other";
 
+  const metadata = await enrichIpMetadata({ ip, cf, existing: previous, kv, cacheKey: visitor.slice(0, 12) });
+
   return {
     id: visitor.slice(0, 12),
     encryptedIp: await encryptIp(ip, encryptionKey),
     visitedAt: new Date().toISOString(),
-    city: cf.city || "Unknown",
-    region: cf.region || "Unknown",
-    country: cf.country || request.headers.get("CF-IPCountry") || "Unknown",
-    timezone: cf.timezone || "Unknown",
-    latitude: cf.latitude || null,
-    longitude: cf.longitude || null,
-    postalCode: cf.postalCode || null,
-    colo: cf.colo || null,
+    city: metadata.city || "Unknown",
+    region: metadata.region || "Unknown",
+    country: metadata.country || request.headers.get("CF-IPCountry") || "Unknown",
+    timezone: metadata.timezone || "Unknown",
+    latitude: metadata.latitude ?? null,
+    longitude: metadata.longitude ?? null,
+    postalCode: metadata.postalCode || null,
+    colo: metadata.colo || null,
+    isp: metadata.isp || "Unknown",
+    asn: metadata.asn || null,
     device,
     browser,
     os,
@@ -88,7 +94,7 @@ export async function onRequest({ request, env }) {
     const retained = recent.filter((item) => Date.parse(item.visitedAt) >= cutoff);
     const previous = retained.find((item) => item.id === visitor.slice(0, 12));
     const encryptionKey = env.IP_ENCRYPTION_KEY || env.ANALYTICS_PASSWORD;
-    const current = await describeVisitor(request, visitor, encryptionKey);
+    const current = await describeVisitor(request, visitor, encryptionKey, env.VIEWS, previous);
     current.firstVisitedAt = previous?.firstVisitedAt || previous?.visitedAt || current.visitedAt;
     current.visits = (previous?.visits || 0) + 1;
     const updated = [current, ...retained.filter((item) => item.id !== current.id)].slice(0, 100);

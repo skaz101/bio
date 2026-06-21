@@ -1,3 +1,5 @@
+import { enrichIpMetadata } from "../lib/ip-metadata.js";
+
 const HEADERS = {
   "content-type": "application/json; charset=utf-8",
   "cache-control": "no-store",
@@ -7,7 +9,7 @@ const HEADERS = {
   "strict-transport-security": "max-age=31536000",
   "content-security-policy": "default-src 'none'; frame-ancestors 'none'"
 };
-const ANALYTICS_VERSION = "1.2.0";
+const ANALYTICS_VERSION = "1.3.0";
 
 function json(body, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: HEADERS });
@@ -26,6 +28,12 @@ async function passwordMatches(actual, expected) {
   return difference === 0;
 }
 
+async function requestFingerprint(request) {
+  const value = `${request.headers.get("CF-Connecting-IP") || "unknown"}:${request.headers.get("User-Agent") || "unknown"}`;
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
+  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
 async function decryptIp(value, secret) {
   if (!value || !secret) return "Not recorded";
   try {
@@ -41,27 +49,45 @@ async function decryptIp(value, secret) {
 export async function onRequest({ request, env }) {
   if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
   if (!env.ANALYTICS_PASSWORD) return json({ error: "ANALYTICS_PASSWORD is not configured" }, 503);
+  if (!env.VIEWS) return json({ error: "VIEWS KV binding is not configured" }, 503);
 
   const origin = request.headers.get("Origin");
   if (origin && origin !== new URL(request.url).origin) return json({ error: "Invalid origin" }, 403);
 
+  const attemptKey = `analytics-auth:${await requestFingerprint(request)}`;
+  const failures = Number(await env.VIEWS.get(attemptKey)) || 0;
+  if (failures >= 5) return json({ error: "Too many attempts. Try again in 15 minutes." }, 429);
+
   let submitted = "";
   try { submitted = (await request.json()).password || ""; } catch {}
-  if (!await passwordMatches(submitted, env.ANALYTICS_PASSWORD)) return json({ error: "Invalid password" }, 401);
+  if (!await passwordMatches(submitted, env.ANALYTICS_PASSWORD)) {
+    await env.VIEWS.put(attemptKey, String(failures + 1), { expirationTtl: 900 });
+    return json({ error: "Invalid password" }, 401);
+  }
+  await env.VIEWS.delete(attemptKey);
 
   const [count, visitors] = await Promise.all([
     env.VIEWS.get("total"),
     env.VIEWS.get("recent", { type: "json" })
   ]);
   const cutoff = Date.now() - (30 * 86400 * 1000);
-  const decrypted = await Promise.all((visitors || []).filter((visitor) => Date.parse(visitor.visitedAt) >= cutoff).map(async (visitor) => {
-    const { encryptedIp, ...safeVisitor } = visitor;
-    return { ...safeVisitor, ip: await decryptIp(encryptedIp, env.IP_ENCRYPTION_KEY || env.ANALYTICS_PASSWORD) };
+  const retained = (visitors || []).filter((visitor) => Date.parse(visitor.visitedAt) >= cutoff);
+  let metadataChanged = false;
+  const enriched = await Promise.all(retained.map(async (visitor) => {
+    const ip = await decryptIp(visitor.encryptedIp, env.IP_ENCRYPTION_KEY || env.ANALYTICS_PASSWORD);
+    const metadata = await enrichIpMetadata({ ip, existing: visitor, kv: env.VIEWS, cacheKey: visitor.id });
+    const stored = { ...visitor, ...metadata };
+    if (stored.city !== visitor.city || stored.region !== visitor.region || stored.country !== visitor.country || stored.timezone !== visitor.timezone || stored.isp !== visitor.isp || stored.asn !== visitor.asn) metadataChanged = true;
+    return { stored, visible: { ...stored, encryptedIp: undefined, ip } };
   }));
+  if (metadataChanged) await env.VIEWS.put("recent", JSON.stringify(enriched.map((item) => item.stored)));
   return json({
     version: ANALYTICS_VERSION,
     count: Number(count) || 0,
-    visitors: decrypted,
+    visitors: enriched.map((item) => {
+      const { encryptedIp, ...visitor } = item.visible;
+      return visitor;
+    }),
     security: {
       ipEncryption: env.IP_ENCRYPTION_KEY ? "dedicated-key" : "password-fallback",
       transport: "https-only",
