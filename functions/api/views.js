@@ -16,8 +16,21 @@ async function hashVisitor(request, salt) {
   return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
-function describeVisitor(request, visitor) {
+async function encryptIp(ip, secret) {
+  if (!secret) return null;
+  const encoder = new TextEncoder();
+  const keyBytes = await crypto.subtle.digest("SHA-256", encoder.encode(secret));
+  const key = await crypto.subtle.importKey("raw", keyBytes, "AES-GCM", false, ["encrypt"]);
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const encrypted = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, encoder.encode(ip)));
+  const packed = new Uint8Array(iv.length + encrypted.length);
+  packed.set(iv); packed.set(encrypted, iv.length);
+  return btoa(String.fromCharCode(...packed));
+}
+
+async function describeVisitor(request, visitor, encryptionKey) {
   const cf = request.cf || {};
+  const ip = request.headers.get("CF-Connecting-IP") || "unknown";
   const agent = request.headers.get("User-Agent") || "";
   const referrer = request.headers.get("Referer") || "";
   let referrerHost = "Direct";
@@ -29,6 +42,7 @@ function describeVisitor(request, visitor) {
 
   return {
     id: visitor.slice(0, 12),
+    encryptedIp: await encryptIp(ip, encryptionKey),
     visitedAt: new Date().toISOString(),
     city: cf.city || "Unknown",
     region: cf.region || "Unknown",
@@ -58,11 +72,13 @@ export async function onRequest({ request, env }) {
   if (!alreadyCounted && !isBot) {
     count += 1;
     const recent = (await env.VIEWS.get("recent", { type: "json" })) || [];
-    recent.unshift(describeVisitor(request, visitor));
+    const cutoff = Date.now() - (30 * 86400 * 1000);
+    const retained = recent.filter((item) => Date.parse(item.visitedAt) >= cutoff);
+    retained.unshift(await describeVisitor(request, visitor, env.IP_ENCRYPTION_KEY));
     await Promise.all([
       env.VIEWS.put("total", String(count)),
       env.VIEWS.put(visitorKey, "1", { expirationTtl: 86400 }),
-      env.VIEWS.put("recent", JSON.stringify(recent.slice(0, 100)))
+      env.VIEWS.put("recent", JSON.stringify(retained.slice(0, 100)))
     ]);
   }
 
