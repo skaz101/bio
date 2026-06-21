@@ -10,8 +10,7 @@ function json(body, status = 200) {
 
 async function hashVisitor(request, salt) {
   const ip = request.headers.get("CF-Connecting-IP") || "unknown";
-  const agent = request.headers.get("User-Agent") || "unknown";
-  const bytes = new TextEncoder().encode(`${salt}:${ip}:${agent}`);
+  const bytes = new TextEncoder().encode(`${salt}:${ip}`);
   const digest = await crypto.subtle.digest("SHA-256", bytes);
   return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
 }
@@ -69,18 +68,25 @@ export async function onRequest({ request, env }) {
   const alreadyCounted = await env.VIEWS.get(visitorKey);
 
   let count = Number(await env.VIEWS.get("total")) || 0;
+  const writes = [];
   if (!alreadyCounted && !isBot) {
     count += 1;
+    writes.push(env.VIEWS.put("total", String(count)), env.VIEWS.put(visitorKey, "1"));
+  }
+
+  if (!isBot) {
     const recent = (await env.VIEWS.get("recent", { type: "json" })) || [];
     const cutoff = Date.now() - (30 * 86400 * 1000);
     const retained = recent.filter((item) => Date.parse(item.visitedAt) >= cutoff);
-    retained.unshift(await describeVisitor(request, visitor, env.IP_ENCRYPTION_KEY));
-    await Promise.all([
-      env.VIEWS.put("total", String(count)),
-      env.VIEWS.put(visitorKey, "1", { expirationTtl: 86400 }),
-      env.VIEWS.put("recent", JSON.stringify(retained.slice(0, 100)))
-    ]);
+    const previous = retained.find((item) => item.id === visitor.slice(0, 12));
+    const current = await describeVisitor(request, visitor, env.IP_ENCRYPTION_KEY);
+    current.firstVisitedAt = previous?.firstVisitedAt || previous?.visitedAt || current.visitedAt;
+    current.visits = (previous?.visits || 0) + 1;
+    const updated = [current, ...retained.filter((item) => item.id !== current.id)].slice(0, 100);
+    writes.push(env.VIEWS.put("recent", JSON.stringify(updated)));
   }
+
+  await Promise.all(writes);
 
   return json({ count, counted: !alreadyCounted && !isBot });
 }

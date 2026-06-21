@@ -4,6 +4,12 @@ import { onRequest as handleAnalytics } from "./functions/api/analytics.js";
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    const protectedRoute = url.pathname === "/analytics" || url.pathname === "/analytics.html" || url.pathname.startsWith("/api/");
+
+    if (protectedRoute && url.protocol !== "https:") {
+      url.protocol = "https:";
+      return Response.redirect(url.toString(), 301);
+    }
 
     if (url.pathname === "/api/views") {
       return handleViews({ request, env });

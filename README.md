@@ -8,7 +8,7 @@ The site deploys as a Cloudflare Worker with static assets. Use these Git build 
 - Deploy command: `npx wrangler deploy`
 - Root directory: `/`
 
-The `VIEWS` KV binding in `wrangler.jsonc` is created automatically during deployment. The `/api/views` endpoint records one view per IP/device combination every 24 hours and stores a SHA-256 visitor hash rather than the raw IP address.
+The `VIEWS` KV binding in `wrangler.jsonc` is created automatically during deployment. The `/api/views` endpoint counts each hashed IP address once without expiration. Return visits update analytics activity and last-seen time without increasing the public total.
 
 Optionally add an encrypted runtime variable named `VIEW_SALT` under **Settings > Variables and Secrets** for stronger visitor hashing.
 
@@ -19,4 +19,6 @@ Add two encrypted runtime secrets under **Settings > Variables and Secrets**, th
 - `ANALYTICS_PASSWORD`: a strong password used to open the dashboard.
 - `IP_ENCRYPTION_KEY`: a separate long random value used to encrypt visitor IP addresses in KV.
 
-Visit `/analytics` and enter the analytics password to see the latest 100 unique daily visitors with approximate city, region, country, IP address, device, browser, referrer, and visit time. IP addresses are encrypted with AES-GCM at rest, decrypted only after authentication, and retained for at most 30 days. Failed login attempts are limited to five per device every 15 minutes.
+Visit `/analytics` and enter the analytics password to see the latest 100 unique IPs with approximate city, region, country, IP address, device, browser, referrer, visit frequency, and last-seen time. IP addresses are encrypted with AES-GCM at rest, decrypted only after authentication, and recent activity is retained for at most 30 days. Failed login attempts are limited to five per device every 15 minutes.
+
+The analytics page and API enforce HTTPS. Neither secret is committed to the repository or sent to site visitors.
