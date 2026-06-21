@@ -19,6 +19,6 @@ Add two encrypted runtime secrets under **Settings > Variables and Secrets**, th
 - `ANALYTICS_PASSWORD`: a strong password used to open the dashboard.
 - `IP_ENCRYPTION_KEY`: a separate long random value used to encrypt visitor IP addresses in KV.
 
-Visit `/analytics` and enter the analytics password to see the latest 100 unique IPs with approximate city, region, country, IP address, device, browser, referrer, visit frequency, and last-seen time. IP addresses are encrypted with AES-GCM at rest, decrypted only after authentication, and recent activity is retained for at most 30 days. Failed login attempts are limited to five per device every 15 minutes.
+Visit `/analytics` and enter the analytics password to see the latest 100 unique IPs with approximate city, region, country, IP address, device, browser, referrer, visit frequency, and last-seen time. IP addresses are encrypted with AES-GCM at rest, decrypted only after authentication, and recent activity is retained for at most 30 days.
 
 The analytics page and API enforce HTTPS. Neither secret is committed to the repository or sent to site visitors.

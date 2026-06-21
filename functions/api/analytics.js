@@ -3,7 +3,7 @@ const HEADERS = {
   "cache-control": "no-store",
   "x-content-type-options": "nosniff"
 };
-const ANALYTICS_VERSION = "1.1.0";
+const ANALYTICS_VERSION = "1.1.1";
 
 function json(body, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: HEADERS });
@@ -20,12 +20,6 @@ async function passwordMatches(actual, expected) {
   let difference = left.length ^ right.length;
   for (let index = 0; index < left.length; index += 1) difference |= left[index] ^ right[index];
   return difference === 0;
-}
-
-async function requestFingerprint(request) {
-  const value = `${request.headers.get("CF-Connecting-IP") || "unknown"}:${request.headers.get("User-Agent") || "unknown"}`;
-  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
-  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
 async function decryptIp(value, secret) {
@@ -47,18 +41,9 @@ export async function onRequest({ request, env }) {
   const origin = request.headers.get("Origin");
   if (origin && origin !== new URL(request.url).origin) return json({ error: "Invalid origin" }, 403);
 
-  const attemptKey = `analytics-auth:${await requestFingerprint(request)}`;
-  const failures = Number(await env.VIEWS.get(attemptKey)) || 0;
-  if (failures >= 5) return json({ error: "Too many attempts. Try again in 15 minutes." }, 429);
-
   let submitted = "";
   try { submitted = (await request.json()).password || ""; } catch {}
-  if (!await passwordMatches(submitted, env.ANALYTICS_PASSWORD)) {
-    await env.VIEWS.put(attemptKey, String(failures + 1), { expirationTtl: 900 });
-    return json({ error: "Invalid password" }, 401);
-  }
-
-  await env.VIEWS.delete(attemptKey);
+  if (!await passwordMatches(submitted, env.ANALYTICS_PASSWORD)) return json({ error: "Invalid password" }, 401);
 
   const [count, visitors] = await Promise.all([
     env.VIEWS.get("total"),
