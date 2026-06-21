@@ -21,10 +21,6 @@ export default {
       return handleAnalytics({ request, env });
     }
 
-    if (url.pathname === "/analytics") {
-      return Response.redirect(`${url.origin}/analytics.html`, 302);
-    }
-
     return env.ASSETS.fetch(request);
   }
 };
