@@ -10,9 +10,10 @@ function json(body, status = 200) {
 
 async function passwordMatches(actual, expected) {
   const encoder = new TextEncoder();
+  const normalize = (value) => String(value).normalize("NFKC").trim();
   const [a, b] = await Promise.all([
-    crypto.subtle.digest("SHA-256", encoder.encode(actual)),
-    crypto.subtle.digest("SHA-256", encoder.encode(expected))
+    crypto.subtle.digest("SHA-256", encoder.encode(normalize(actual))),
+    crypto.subtle.digest("SHA-256", encoder.encode(normalize(expected)))
   ]);
   const left = new Uint8Array(a), right = new Uint8Array(b);
   let difference = left.length ^ right.length;
