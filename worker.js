@@ -5,8 +5,10 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const protectedRoute = url.pathname === "/analytics" || url.pathname === "/analytics.html" || url.pathname.startsWith("/api/");
+    let visitorScheme = "";
+    try { visitorScheme = JSON.parse(request.headers.get("CF-Visitor") || "{}").scheme || ""; } catch {}
 
-    if (protectedRoute && url.protocol !== "https:") {
+    if (protectedRoute && visitorScheme === "http") {
       url.protocol = "https:";
       return Response.redirect(url.toString(), 301);
     }
