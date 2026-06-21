@@ -22,3 +22,5 @@ Add two encrypted runtime secrets under **Settings > Variables and Secrets**, th
 Visit `/analytics` and enter the analytics password to see the latest 100 unique IPs with approximate city, region, country, IP address, device, browser, referrer, visit frequency, and last-seen time. IP addresses are encrypted with AES-GCM at rest, decrypted only after authentication, and recent activity is retained for at most 30 days.
 
 The analytics page and API enforce HTTPS. Neither secret is committed to the repository or sent to site visitors.
+
+`keep_vars` is enabled in `wrangler.jsonc` so Git deployments preserve dashboard-managed runtime secrets. If `IP_ENCRYPTION_KEY` is temporarily unavailable, IPs remain encrypted using `ANALYTICS_PASSWORD` as a fallback rather than being discarded.

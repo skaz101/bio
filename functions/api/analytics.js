@@ -1,9 +1,13 @@
 const HEADERS = {
   "content-type": "application/json; charset=utf-8",
   "cache-control": "no-store",
-  "x-content-type-options": "nosniff"
+  "x-content-type-options": "nosniff",
+  "x-frame-options": "DENY",
+  "referrer-policy": "no-referrer",
+  "strict-transport-security": "max-age=31536000",
+  "content-security-policy": "default-src 'none'; frame-ancestors 'none'"
 };
-const ANALYTICS_VERSION = "1.1.1";
+const ANALYTICS_VERSION = "1.2.0";
 
 function json(body, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: HEADERS });
@@ -52,7 +56,16 @@ export async function onRequest({ request, env }) {
   const cutoff = Date.now() - (30 * 86400 * 1000);
   const decrypted = await Promise.all((visitors || []).filter((visitor) => Date.parse(visitor.visitedAt) >= cutoff).map(async (visitor) => {
     const { encryptedIp, ...safeVisitor } = visitor;
-    return { ...safeVisitor, ip: await decryptIp(encryptedIp, env.IP_ENCRYPTION_KEY) };
+    return { ...safeVisitor, ip: await decryptIp(encryptedIp, env.IP_ENCRYPTION_KEY || env.ANALYTICS_PASSWORD) };
   }));
-  return json({ version: ANALYTICS_VERSION, count: Number(count) || 0, visitors: decrypted });
+  return json({
+    version: ANALYTICS_VERSION,
+    count: Number(count) || 0,
+    visitors: decrypted,
+    security: {
+      ipEncryption: env.IP_ENCRYPTION_KEY ? "dedicated-key" : "password-fallback",
+      transport: "https-only",
+      storage: "aes-gcm"
+    }
+  });
 }

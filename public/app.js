@@ -118,7 +118,11 @@ type();
 
 async function loadViews() {
   try {
-    const response = await fetch("/api/views", { method: "POST", cache: "no-store" });
+    const response = await fetch("/api/views", {
+      method: "POST",
+      cache: "no-store",
+      headers: { "X-Visitor-Referrer": document.referrer || "" }
+    });
     if (!response.ok) throw new Error("View counter is unavailable");
     const data = await response.json();
     $("viewCount").textContent = Number(data.count).toLocaleString();

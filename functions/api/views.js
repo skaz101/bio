@@ -1,7 +1,11 @@
 const JSON_HEADERS = {
   "content-type": "application/json; charset=utf-8",
   "cache-control": "no-store",
-  "x-content-type-options": "nosniff"
+  "x-content-type-options": "nosniff",
+  "x-frame-options": "DENY",
+  "referrer-policy": "no-referrer",
+  "strict-transport-security": "max-age=31536000",
+  "content-security-policy": "default-src 'none'; frame-ancestors 'none'"
 };
 
 function json(body, status = 200) {
@@ -31,7 +35,7 @@ async function describeVisitor(request, visitor, encryptionKey) {
   const cf = request.cf || {};
   const ip = request.headers.get("CF-Connecting-IP") || "unknown";
   const agent = request.headers.get("User-Agent") || "";
-  const referrer = request.headers.get("Referer") || "";
+  const referrer = request.headers.get("X-Visitor-Referrer") || request.headers.get("Referer") || "";
   let referrerHost = "Direct";
   try { referrerHost = new URL(referrer).hostname || "Direct"; } catch {}
 
@@ -45,8 +49,12 @@ async function describeVisitor(request, visitor, encryptionKey) {
     visitedAt: new Date().toISOString(),
     city: cf.city || "Unknown",
     region: cf.region || "Unknown",
-    country: cf.country || "Unknown",
+    country: cf.country || request.headers.get("CF-IPCountry") || "Unknown",
     timezone: cf.timezone || "Unknown",
+    latitude: cf.latitude || null,
+    longitude: cf.longitude || null,
+    postalCode: cf.postalCode || null,
+    colo: cf.colo || null,
     device,
     browser,
     os,
@@ -79,7 +87,8 @@ export async function onRequest({ request, env }) {
     const cutoff = Date.now() - (30 * 86400 * 1000);
     const retained = recent.filter((item) => Date.parse(item.visitedAt) >= cutoff);
     const previous = retained.find((item) => item.id === visitor.slice(0, 12));
-    const current = await describeVisitor(request, visitor, env.IP_ENCRYPTION_KEY);
+    const encryptionKey = env.IP_ENCRYPTION_KEY || env.ANALYTICS_PASSWORD;
+    const current = await describeVisitor(request, visitor, encryptionKey);
     current.firstVisitedAt = previous?.firstVisitedAt || previous?.visitedAt || current.visitedAt;
     current.visits = (previous?.visits || 0) + 1;
     const updated = [current, ...retained.filter((item) => item.id !== current.id)].slice(0, 100);
@@ -88,5 +97,13 @@ export async function onRequest({ request, env }) {
 
   await Promise.all(writes);
 
-  return json({ count, counted: !alreadyCounted && !isBot });
+  return json({
+    count,
+    counted: !alreadyCounted && !isBot,
+    diagnostics: {
+      ipAvailable: request.headers.has("CF-Connecting-IP"),
+      geolocationAvailable: Boolean(request.cf && Object.keys(request.cf).length),
+      encryptionAvailable: Boolean(env.IP_ENCRYPTION_KEY || env.ANALYTICS_PASSWORD)
+    }
+  });
 }
