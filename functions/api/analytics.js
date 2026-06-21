@@ -3,6 +3,7 @@ const HEADERS = {
   "cache-control": "no-store",
   "x-content-type-options": "nosniff"
 };
+const ANALYTICS_VERSION = "1.1.0";
 
 function json(body, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: HEADERS });
@@ -68,5 +69,5 @@ export async function onRequest({ request, env }) {
     const { encryptedIp, ...safeVisitor } = visitor;
     return { ...safeVisitor, ip: await decryptIp(encryptedIp, env.IP_ENCRYPTION_KEY) };
   }));
-  return json({ count: Number(count) || 0, visitors: decrypted });
+  return json({ version: ANALYTICS_VERSION, count: Number(count) || 0, visitors: decrypted });
 }
